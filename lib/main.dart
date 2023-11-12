@@ -26,7 +26,7 @@ class TaskManagerApp extends StatelessWidget {
               style: ElevatedButton.styleFrom(
             padding: const EdgeInsets.all(10),
           ))),
-      home: const BottomNavScreen(),
+      home: const LoginScreen(),
     );
   }
 }
