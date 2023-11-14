@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:task_manager/data/network_caller/network_caller.dart';
-import 'package:task_manager/ui/screen/otp_screen.dart';
 import 'package:task_manager/ui/widget/body_bg.dart';
 import 'package:task_manager/ui/widget/snack_message.dart';
 
@@ -135,7 +134,7 @@ class _SignupScreenState extends State<SignupScreen> {
       if (response.isSuccess) {
         _clearTextFields();
         if (mounted) {
-          showSnackMessage(context, "Account has been created! please login");
+          showSnackMessage(context, "Account has been created! please Sign in");
         }
         // Navigator.push(
         //     context,
