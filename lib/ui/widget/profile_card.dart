@@ -18,7 +18,7 @@ class _ProfileCardState extends State<ProfileCard> {
   Widget build(BuildContext context) {
     return ListTile(
       tileColor: Colors.green,
-      leading: CircleAvatar(child: Icon(Icons.person)),
+      leading:const CircleAvatar(child: Icon(Icons.person)),
       title: Text(fullName, style: const TextStyle(color: Colors.white)),
       subtitle: Text(AuthController.user!.email ?? '',
           style: const TextStyle(color: Colors.white)),

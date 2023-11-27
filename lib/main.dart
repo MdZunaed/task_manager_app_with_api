@@ -6,12 +6,15 @@ void main() {
 }
 
 class TaskManagerApp extends StatelessWidget {
+  static GlobalKey<NavigatorState> navigationKey = GlobalKey();
+
   const TaskManagerApp({super.key});
 
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
+      navigatorKey: navigationKey,
       theme: ThemeData(
         primaryColor: Colors.green,
         primarySwatch: Colors.green,

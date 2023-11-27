@@ -1,7 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager/models/task.dart';
 
 class TaskItemCard extends StatelessWidget {
-  const TaskItemCard({super.key});
+  final Task task;
+
+  const TaskItemCard({super.key, required this.task});
 
   @override
   Widget build(BuildContext context) {
@@ -12,19 +15,20 @@ class TaskItemCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text("title",
+            Text(task.title ?? '',
                 style:
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             const SizedBox(height: 6),
-            Text("description", style: const TextStyle(color: Colors.black54)),
+            Text(task.description ?? '',
+                style: const TextStyle(color: Colors.black54)),
             const SizedBox(height: 6),
-            Text("date"),
+            Text("date: ${task.createdDate}"),
             const SizedBox(height: 6),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Chip(
-                    label: Text("status",
+                    label: Text(task.status ?? 'New',
                         style: const TextStyle(color: Colors.white)),
                     backgroundColor: Colors.lightBlue),
                 Wrap(

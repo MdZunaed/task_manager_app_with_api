@@ -37,10 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
               children: [
                 const SizedBox(height: 100),
                 Text("Get Stared With",
-                    style: Theme
-                        .of(context)
-                        .textTheme
-                        .headlineMedium),
+                    style: Theme.of(context).textTheme.headlineMedium),
                 const SizedBox(height: 16),
                 TextFormField(
                     controller: emailController,
@@ -67,13 +64,13 @@ class _LoginScreenState extends State<LoginScreen> {
                     child: loginProcessing
                         ? const Center(child: CircularProgressIndicator())
                         : ElevatedButton(
-                        onPressed: () {
-                          if (formKey.currentState!.validate()) {
-                            login();
-                          }
-                        },
-                        child:
-                        const Icon(Icons.arrow_circle_right_outlined))),
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                login();
+                              }
+                            },
+                            child:
+                                const Icon(Icons.arrow_circle_right_outlined))),
                 const SizedBox(height: 30),
                 Center(
                   child: TextButton(
@@ -114,7 +111,8 @@ class _LoginScreenState extends State<LoginScreen> {
         body: {
           "email": emailController.text.trim(),
           "password": passwordController.text
-        });
+        },
+        isLogin: true);
     loginProcessing = false;
     if (mounted) {
       setState(() {});
@@ -139,7 +137,6 @@ class _LoginScreenState extends State<LoginScreen> {
       }
     }
   }
-
 
   @override
   void dispose() {

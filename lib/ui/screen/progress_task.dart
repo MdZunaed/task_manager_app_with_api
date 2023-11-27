@@ -19,7 +19,7 @@ class ProgressTaskScreen extends StatelessWidget {
               physics: const BouncingScrollPhysics(),
               itemCount: 3,
               itemBuilder: (context, index) {
-                return const TaskItemCard();
+                // return const TaskItemCard();
               },
             ),
           ),
