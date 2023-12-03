@@ -66,7 +66,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       }
                       return null;
                     },
-                    keyboardType: TextInputType.number,
+                    keyboardType: TextInputType.phone,
                     decoration: const InputDecoration(hintText: "Mobile")),
                 const SizedBox(height: 16),
                 TextFormField(

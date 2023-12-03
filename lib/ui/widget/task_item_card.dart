@@ -1,10 +1,54 @@
 import 'package:flutter/material.dart';
+import 'package:task_manager/data/network_caller/network_caller.dart';
+import 'package:task_manager/data/utility/urls.dart';
 import 'package:task_manager/models/task.dart';
+import 'package:task_manager/ui/widget/snack_message.dart';
 
-class TaskItemCard extends StatelessWidget {
+enum TaskStatus {
+  New,
+  Progress,
+  Completed,
+  Cancelled,
+}
+
+class TaskItemCard extends StatefulWidget {
   final Task task;
+  final VoidCallback onStatusChange;
+  final Function(bool) showProgress;
 
-  const TaskItemCard({super.key, required this.task});
+  const TaskItemCard(
+      {super.key,
+      required this.task,
+      required this.onStatusChange,
+      required this.showProgress});
+
+  @override
+  State<TaskItemCard> createState() => _TaskItemCardState();
+}
+
+class _TaskItemCardState extends State<TaskItemCard> {
+  Future<void> updateTaskStatus(String status) async {
+    widget.showProgress(true);
+    final response = await NetworkCaller()
+        .getRequest(Urls.updateTaskStatus(widget.task.sId ?? '', status));
+    if (response.isSuccess) {
+      widget.onStatusChange();
+    }
+    widget.showProgress(false);
+  }
+
+  Future<void> deleteTask() async {
+    widget.showProgress(true);
+    final response = await NetworkCaller()
+        .getRequest(Urls.deleteTask(widget.task.sId ?? ''));
+    if (response.isSuccess) {
+      if (mounted) {
+        showSnackMessage(context, "Task deleted");
+      }
+      widget.onStatusChange();
+      widget.showProgress(false);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,32 +59,33 @@ class TaskItemCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Text(task.title ?? '',
+            Text(widget.task.title ?? '',
                 style:
                     const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             const SizedBox(height: 6),
-            Text(task.description ?? '',
+            Text(widget.task.description ?? '',
                 style: const TextStyle(color: Colors.black54)),
             const SizedBox(height: 6),
-            Text("date: ${task.createdDate}"),
+            Text("date: ${widget.task.createdDate}"),
             const SizedBox(height: 6),
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 Chip(
-                    label: Text(task.status ?? 'New',
+                    label: Text(widget.task.status ?? 'New',
                         style: const TextStyle(color: Colors.white)),
                     backgroundColor: Colors.lightBlue),
                 Wrap(
                   children: [
                     IconButton(
-                        onPressed: () {},
+                        onPressed: deleteTask,
                         icon: const Icon(
                           Icons.delete,
                           color: Colors.red,
                         )),
                     IconButton(
-                        onPressed: () {}, icon: const Icon(Icons.edit_note)),
+                        onPressed: showUpdateStatusModal,
+                        icon: const Icon(Icons.edit_note)),
                   ],
                 )
               ],
@@ -49,5 +94,35 @@ class TaskItemCard extends StatelessWidget {
         ),
       ),
     );
+  }
+
+  void showUpdateStatusModal() {
+    List<ListTile> items = TaskStatus.values
+        .map((e) => ListTile(
+              title: Text(e.name),
+              onTap: () {
+                updateTaskStatus(e.name);
+                Navigator.pop(context);
+              },
+            ))
+        .toList();
+    showDialog(
+        context: context,
+        builder: (context) {
+          return AlertDialog(
+            title: const Text("Update Status"),
+            actions: [
+              TextButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  child: const Text("Cancel"))
+            ],
+            content: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: items,
+            ),
+          );
+        });
   }
 }

@@ -7,7 +7,9 @@ import 'package:task_manager/ui/widget/profile_card.dart';
 import 'package:task_manager/ui/widget/snack_message.dart';
 
 class AddNewTaskScreen extends StatefulWidget {
-  const AddNewTaskScreen({super.key});
+  final VoidCallback updateStatusCount;
+
+  const AddNewTaskScreen({super.key, required this.updateStatusCount});
 
   @override
   State<AddNewTaskScreen> createState() => _AddNewTaskScreenState();
@@ -57,7 +59,10 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
                         child: addTaskProcessing
                             ? const Center(child: CircularProgressIndicator())
                             : ElevatedButton(
-                                onPressed: createTask,
+                                onPressed: () {
+                                  createTask().then(
+                                      (value) => widget.updateStatusCount);
+                                },
                                 child: const Icon(Icons.add_circle),
                               ),
                       ),
@@ -94,6 +99,7 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
         }
         subTEController.clear();
         desTEController.clear();
+        widget.updateStatusCount;
       } else {
         if (mounted) {
           showSnackMessage(context, "Task creation failed", true);

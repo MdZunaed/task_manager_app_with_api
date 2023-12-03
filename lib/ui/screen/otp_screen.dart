@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:task_manager/ui/screen/set_password.dart';
 import 'package:task_manager/ui/widget/body_bg.dart';
 
 import 'login_screen.dart';
@@ -44,7 +45,13 @@ class OtpScreen extends StatelessWidget {
               SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                      onPressed: () {}, child: const Text("Verify"))),
+                      onPressed: () {
+                        Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                                builder: (context) => const SetPassword()));
+                      },
+                      child: const Text("Verify"))),
               const SizedBox(height: 30),
               Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                 const Text("Have an account?"),

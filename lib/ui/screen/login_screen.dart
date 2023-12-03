@@ -50,6 +50,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     decoration: const InputDecoration(hintText: "Email")),
                 const SizedBox(height: 16),
                 TextFormField(
+                    obscureText: true,
                     controller: passwordController,
                     validator: (String? value) {
                       if (value?.isEmpty ?? true) {

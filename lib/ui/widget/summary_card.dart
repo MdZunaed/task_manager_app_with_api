@@ -12,9 +12,9 @@ class SummaryCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
+      //margin: const EdgeInsets.symmetric(vertical: 10, horizontal: 6),
       child: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 22, vertical: 14),
+        padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
         child: Column(
           children: [
             Text(count, style: Theme.of(context).textTheme.titleLarge),
