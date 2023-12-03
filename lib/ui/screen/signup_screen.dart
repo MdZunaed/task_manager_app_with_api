@@ -136,10 +136,6 @@ class _SignupScreenState extends State<SignupScreen> {
         if (mounted) {
           showSnackMessage(context, "Account has been created! please Sign in");
         }
-        // Navigator.push(
-        //     context,
-        //     MaterialPageRoute(
-        //         builder: (context) => const OtpScreen()));
       }
     } else {
       signupProcessing = false;

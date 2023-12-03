@@ -69,9 +69,9 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
   }
 
   @override
-  void didChangeDependencies() {
-    super.didChangeDependencies();
+  void didUpdateWidget(covariant NewTaskScreen oldWidget) {
     getNewTaskList();
+    super.didUpdateWidget(oldWidget);
   }
 
   @override
@@ -82,8 +82,7 @@ class _NewTaskScreenState extends State<NewTaskScreen> {
               Navigator.push(
                   context,
                   MaterialPageRoute(
-                      builder: (context) =>
-                          AddNewTaskScreen(updateStatusCount: getNewTaskList)));
+                      builder: (context) => const AddNewTaskScreen()));
             },
             child: const Icon(Icons.add)),
         body: SafeArea(
