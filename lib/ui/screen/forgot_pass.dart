@@ -31,8 +31,11 @@ class _ForgotPasswordState extends State<ForgotPassword> {
       verifyEmailProcessing = false;
       if (mounted) {
         setState(() {});
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const OtpScreen()));
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) =>
+                    OtpScreen(email: emailTEController.text.trim())));
       }
     } else {
       if (mounted) {
