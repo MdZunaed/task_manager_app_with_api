@@ -142,12 +142,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           child: const Text("Save"),
                           onPressed: () {
                             if (formKey.currentState!.validate()) {
-                              updateProfile().then((value) =>
-                                  Navigator.pushReplacement(
-                                      context,
-                                      MaterialPageRoute(
-                                          builder: (context) =>
-                                              const NewTaskScreen())));
+                              updateProfile();
                             }
                           },
                         ),
