@@ -7,7 +7,6 @@ import 'package:task_manager/data/network_caller/network_caller.dart';
 import 'package:task_manager/data/network_caller/network_response.dart';
 import 'package:task_manager/data/utility/urls.dart';
 import 'package:task_manager/models/user_model.dart';
-import 'package:task_manager/ui/screen/new_task_list.dart';
 import 'package:task_manager/ui/widget/body_bg.dart';
 import 'package:task_manager/ui/widget/profile_card.dart';
 import 'package:task_manager/ui/widget/snack_message.dart';
@@ -190,7 +189,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                   padding: const EdgeInsets.all(10),
                   child: photo == null
                       ? const Text('select photo')
-                      : Text(photo!.name ?? ''),
+                      : Text(photo!.name),
                 )),
           ],
         ),
