@@ -11,6 +11,8 @@ import 'package:task_manager/ui/widget/body_bg.dart';
 import 'package:task_manager/ui/widget/profile_card.dart';
 import 'package:task_manager/ui/widget/snack_message.dart';
 
+import 'main_nav_screen.dart';
+
 class EditProfileScreen extends StatefulWidget {
   const EditProfileScreen({super.key});
 
@@ -82,75 +84,85 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Form(
-          key: formKey,
-          child: Column(
-            children: [
-              const ProfileCard(enableOnTap: false),
-              Expanded(
-                  child: BodyBackground(
-                      child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    const SizedBox(height: 30),
-                    Text("Update Profile",
-                        style: Theme.of(context).textTheme.titleLarge),
-                    const SizedBox(height: 16),
-                    photoPicker(),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                        controller: emailTEController,
-                        validator: validator,
-                        decoration: const InputDecoration(hintText: "Email")),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                        controller: firstNameTEController,
-                        validator: validator,
-                        decoration:
-                            const InputDecoration(hintText: "First Name")),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                        controller: lastNameTEController,
-                        validator: validator,
-                        decoration:
-                            const InputDecoration(hintText: "Last Name")),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                        controller: mobileTEController,
-                        validator: validator,
-                        keyboardType: TextInputType.phone,
-                        decoration: const InputDecoration(hintText: "Mobile")),
-                    const SizedBox(height: 8),
-                    TextFormField(
-                        obscureText: true,
-                        decoration: const InputDecoration(
-                            hintText: "Password (optional)")),
-                    const SizedBox(height: 16),
-                    Visibility(
-                      visible: updateProfileProcessing == false,
-                      replacement:
-                          const Center(child: CircularProgressIndicator()),
-                      child: SizedBox(
-                        height: 45,
-                        width: double.infinity,
-                        child: ElevatedButton(
-                          child: const Text("Save"),
-                          onPressed: () {
-                            if (formKey.currentState!.validate()) {
-                              updateProfile();
-                            }
-                          },
+    return WillPopScope(
+      onWillPop: () async {
+        await Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const BottomNavScreen()),
+            (route) => false);
+        return false;
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Form(
+            key: formKey,
+            child: Column(
+              children: [
+                const ProfileCard(enableOnTap: false),
+                Expanded(
+                    child: BodyBackground(
+                        child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 30),
+                      Text("Update Profile",
+                          style: Theme.of(context).textTheme.titleLarge),
+                      const SizedBox(height: 16),
+                      photoPicker(),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                          controller: emailTEController,
+                          validator: validator,
+                          decoration: const InputDecoration(hintText: "Email")),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                          controller: firstNameTEController,
+                          validator: validator,
+                          decoration:
+                              const InputDecoration(hintText: "First Name")),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                          controller: lastNameTEController,
+                          validator: validator,
+                          decoration:
+                              const InputDecoration(hintText: "Last Name")),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                          controller: mobileTEController,
+                          validator: validator,
+                          keyboardType: TextInputType.phone,
+                          decoration:
+                              const InputDecoration(hintText: "Mobile")),
+                      const SizedBox(height: 8),
+                      TextFormField(
+                          obscureText: true,
+                          decoration: const InputDecoration(
+                              hintText: "Password (optional)")),
+                      const SizedBox(height: 16),
+                      Visibility(
+                        visible: updateProfileProcessing == false,
+                        replacement:
+                            const Center(child: CircularProgressIndicator()),
+                        child: SizedBox(
+                          height: 45,
+                          width: double.infinity,
+                          child: ElevatedButton(
+                            child: const Text("Save"),
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                updateProfile();
+                              }
+                            },
+                          ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              )))
-            ],
+                    ],
+                  ),
+                )))
+              ],
+            ),
           ),
         ),
       ),
