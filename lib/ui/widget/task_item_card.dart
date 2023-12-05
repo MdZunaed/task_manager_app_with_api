@@ -12,15 +12,17 @@ enum TaskStatus {
 }
 
 class TaskItemCard extends StatefulWidget {
+
   final Task task;
   final VoidCallback onStatusChange;
   final Function(bool) showProgress;
+  final Color statusBgColor;
 
-  const TaskItemCard(
-      {super.key,
-      required this.task,
-      required this.onStatusChange,
-      required this.showProgress});
+
+  const TaskItemCard({super.key,
+    required this.task,
+    required this.onStatusChange,
+    required this.showProgress, this.statusBgColor = Colors.lightBlue});
 
   @override
   State<TaskItemCard> createState() => _TaskItemCardState();
@@ -61,7 +63,7 @@ class _TaskItemCardState extends State<TaskItemCard> {
           children: [
             Text(widget.task.title ?? '',
                 style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             const SizedBox(height: 6),
             Text(widget.task.description ?? '',
                 style: const TextStyle(color: Colors.black54)),
@@ -74,7 +76,7 @@ class _TaskItemCardState extends State<TaskItemCard> {
                 Chip(
                     label: Text(widget.task.status ?? 'New',
                         style: const TextStyle(color: Colors.white)),
-                    backgroundColor: Colors.lightBlue),
+                    backgroundColor: widget.statusBgColor),
                 Wrap(
                   children: [
                     IconButton(
@@ -98,13 +100,14 @@ class _TaskItemCardState extends State<TaskItemCard> {
 
   void showUpdateStatusModal() {
     List<ListTile> items = TaskStatus.values
-        .map((e) => ListTile(
-              title: Text(e.name),
-              onTap: () {
-                updateTaskStatus(e.name);
-                Navigator.pop(context);
-              },
-            ))
+        .map((e) =>
+        ListTile(
+          title: Text(e.name),
+          onTap: () {
+            updateTaskStatus(e.name);
+            Navigator.pop(context);
+          },
+        ))
         .toList();
     showDialog(
         context: context,

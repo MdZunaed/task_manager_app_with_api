@@ -5,7 +5,6 @@ import '../../data/network_caller/network_response.dart';
 import '../../data/utility/urls.dart';
 import '../../models/task_list_model.dart';
 import '../widget/profile_card.dart';
-import '../widget/summary_card.dart';
 import '../widget/task_item_card.dart';
 
 class ProgressTaskScreen extends StatefulWidget {
@@ -58,6 +57,7 @@ class _ProgressTaskScreenState extends State<ProgressTaskScreen> {
                   itemCount: taskListModel.taskList?.length ?? 0,
                   itemBuilder: (context, index) {
                     return TaskItemCard(
+                      statusBgColor: Colors.orange,
                       task: taskListModel.taskList![index],
                       onStatusChange: () {
                         getProgressTaskList();

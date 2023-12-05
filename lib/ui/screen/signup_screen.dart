@@ -80,6 +80,7 @@ class _SignupScreenState extends State<SignupScreen> {
                       }
                       return null;
                     },
+                    obscureText: true,
                     decoration: const InputDecoration(hintText: "Password")),
                 const SizedBox(height: 16),
                 SizedBox(
