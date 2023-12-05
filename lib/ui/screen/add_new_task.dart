@@ -42,10 +42,6 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
         }
         subTEController.clear();
         desTEController.clear();
-        if (mounted) {
-          Navigator.pushReplacement(context,
-              MaterialPageRoute(builder: (context) => const BottomNavScreen()));
-        }
       } else {
         if (mounted) {
           showSnackMessage(context, "Task creation failed", true);
@@ -56,52 +52,61 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          children: [
-            const ProfileCard(),
-            Expanded(
-                child: BodyBackground(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(16),
-                child: Form(
-                  key: formKey,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      const SizedBox(height: 30),
-                      Text("Add New Task",
-                          style: Theme.of(context).textTheme.titleLarge),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                          controller: subTEController,
-                          validator: validator,
-                          decoration:
-                              const InputDecoration(hintText: "Subject")),
-                      const SizedBox(height: 16),
-                      TextFormField(
-                          maxLines: 5,
-                          controller: desTEController,
-                          validator: validator,
-                          decoration:
-                              const InputDecoration(hintText: "Description")),
-                      const SizedBox(height: 16),
-                      SizedBox(
-                        width: double.infinity,
-                        child: addTaskProcessing
-                            ? const Center(child: CircularProgressIndicator())
-                            : ElevatedButton(
-                                onPressed: createTask,
-                                child: const Icon(Icons.add_circle),
-                              ),
-                      ),
-                    ],
+    return WillPopScope(
+      onWillPop: () async {
+        await Navigator.pushAndRemoveUntil(
+            context,
+            MaterialPageRoute(builder: (context) => const BottomNavScreen()),
+            (route) => false);
+        return false;
+      },
+      child: Scaffold(
+        body: SafeArea(
+          child: Column(
+            children: [
+              const ProfileCard(),
+              Expanded(
+                  child: BodyBackground(
+                child: SingleChildScrollView(
+                  padding: const EdgeInsets.all(16),
+                  child: Form(
+                    key: formKey,
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const SizedBox(height: 30),
+                        Text("Add New Task",
+                            style: Theme.of(context).textTheme.titleLarge),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                            controller: subTEController,
+                            validator: validator,
+                            decoration:
+                                const InputDecoration(hintText: "Subject")),
+                        const SizedBox(height: 16),
+                        TextFormField(
+                            maxLines: 5,
+                            controller: desTEController,
+                            validator: validator,
+                            decoration:
+                                const InputDecoration(hintText: "Description")),
+                        const SizedBox(height: 16),
+                        SizedBox(
+                          width: double.infinity,
+                          child: addTaskProcessing
+                              ? const Center(child: CircularProgressIndicator())
+                              : ElevatedButton(
+                                  onPressed: createTask,
+                                  child: const Icon(Icons.add_circle),
+                                ),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
-              ),
-            ))
-          ],
+              ))
+            ],
+          ),
         ),
       ),
     );
