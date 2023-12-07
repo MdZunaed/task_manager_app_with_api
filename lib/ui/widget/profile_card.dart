@@ -22,7 +22,8 @@ class _ProfileCardState extends State<ProfileCard> {
     return ListTile(
       tileColor: Colors.green,
       leading: CircleAvatar(
-          child: AuthController.user?.photo == ""
+          child: (AuthController.user?.photo == "" ||
+                  AuthController.user?.photo == null)
               ? const Icon(Icons.person)
               : ClipOval(
                   child: Image.memory(imageBytes,
