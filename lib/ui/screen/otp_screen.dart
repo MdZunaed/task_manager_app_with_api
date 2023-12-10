@@ -1,11 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
+import 'package:task_manager/controller/reset_pass_controller.dart';
 import 'package:task_manager/ui/screen/set_password.dart';
 import 'package:task_manager/ui/widget/body_bg.dart';
-
-import '../../data/network_caller/network_caller.dart';
-import '../../data/network_caller/network_response.dart';
-import '../../data/utility/urls.dart';
 import '../widget/snack_message.dart';
 import 'login_screen.dart';
 
@@ -21,33 +19,7 @@ class OtpScreen extends StatefulWidget {
 class _OtpScreenState extends State<OtpScreen> {
   final TextEditingController otpTEController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey();
-  bool verifyOtpProcessing = false;
-
-  Future<void> verifyOtp() async {
-    verifyOtpProcessing = true;
-    if (mounted) {
-      setState(() {});
-    }
-    final NetworkResponse response = await NetworkCaller()
-        .getRequest(Urls.verifyOtp(widget.email, otpTEController.text.trim()));
-    if (response.isSuccess) {
-      verifyOtpProcessing = false;
-      if (mounted) {
-        setState(() {});
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) => SetPassword(
-                      email: widget.email,
-                      otp: otpTEController.text,
-                    )));
-      }
-    } else {
-      if (mounted) {
-        showSnackMessage(context, "Something went error, try again", true);
-      }
-    }
-  }
+  ResetPasswordController controller = Get.find<ResetPasswordController>();
 
   @override
   Widget build(BuildContext context) {
@@ -97,27 +69,27 @@ class _OtpScreenState extends State<OtpScreen> {
                 const SizedBox(height: 16),
                 SizedBox(
                     width: double.infinity,
-                    child: Visibility(
-                      visible: verifyOtpProcessing == false,
-                      replacement:
-                          const Center(child: CircularProgressIndicator()),
-                      child: ElevatedButton(
-                          onPressed: () {
-                            if (formKey.currentState!.validate()) {
-                              verifyOtp();
-                            }
-                          },
-                          child: const Text("Verify")),
-                    )),
+                    child: GetBuilder<ResetPasswordController>(
+                        builder: (controller) {
+                      return Visibility(
+                        visible: controller.verifyOtpProcessing == false,
+                        replacement:
+                            const Center(child: CircularProgressIndicator()),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                verifyOtp();
+                              }
+                            },
+                            child: const Text("Verify")),
+                      );
+                    })),
                 const SizedBox(height: 30),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   const Text("Have an account?"),
                   TextButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginScreen()));
+                        Get.to(const LoginScreen());
                       },
                       child: const Text("Sign in",
                           style: TextStyle(fontWeight: FontWeight.bold)))
@@ -128,5 +100,17 @@ class _OtpScreenState extends State<OtpScreen> {
         ),
       ),
     );
+  }
+
+  Future<void> verifyOtp() async {
+    final response =
+        await controller.verifyOtp(widget.email, otpTEController.text.trim());
+    if (response) {
+      Get.to(SetPassword(email: widget.email, otp: otpTEController.text));
+    } else {
+      if (mounted) {
+        showSnackMessage(context, controller.errorMessage, true);
+      }
+    }
   }
 }

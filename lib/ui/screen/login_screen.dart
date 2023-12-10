@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/controller/auth_controller.dart';
-import 'package:task_manager/data/network_caller/network_caller.dart';
-import 'package:task_manager/data/network_caller/network_response.dart';
-import 'package:task_manager/data/utility/urls.dart';
-import 'package:task_manager/models/user_model.dart';
-import 'package:task_manager/ui/screen/main_nav_screen.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/ui/screen/bottom_nav_screen.dart';
 import 'package:task_manager/ui/screen/forgot_pass.dart';
 import 'package:task_manager/ui/screen/signup_screen.dart';
 import 'package:task_manager/ui/widget/body_bg.dart';
 import 'package:task_manager/ui/widget/snack_message.dart';
+import '../../controller/login_controller.dart';
 
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
@@ -18,10 +15,10 @@ class LoginScreen extends StatefulWidget {
 }
 
 class _LoginScreenState extends State<LoginScreen> {
-  final TextEditingController emailController = TextEditingController();
-  final TextEditingController passwordController = TextEditingController();
+  final TextEditingController emailTEController = TextEditingController();
+  final TextEditingController passwordTEController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey();
-  bool loginProcessing = false;
+  final loginController = Get.find<LoginController>();
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +37,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     style: Theme.of(context).textTheme.headlineMedium),
                 const SizedBox(height: 16),
                 TextFormField(
-                    controller: emailController,
+                    controller: emailTEController,
                     validator: (String? value) {
                       if (value?.isEmpty ?? true) {
                         return 'Enter email';
@@ -51,7 +48,7 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 16),
                 TextFormField(
                     obscureText: true,
-                    controller: passwordController,
+                    controller: passwordTEController,
                     validator: (String? value) {
                       if (value?.isEmpty ?? true) {
                         return 'Enter password';
@@ -62,24 +59,24 @@ class _LoginScreenState extends State<LoginScreen> {
                 const SizedBox(height: 16),
                 SizedBox(
                     width: double.infinity,
-                    child: loginProcessing
-                        ? const Center(child: CircularProgressIndicator())
-                        : ElevatedButton(
-                            onPressed: () {
-                              if (formKey.currentState!.validate()) {
-                                login();
-                              }
-                            },
-                            child:
-                                const Icon(Icons.arrow_circle_right_outlined))),
+                    child: GetBuilder<LoginController>(
+                      builder: (controller) {
+                        return Visibility(
+                            visible: controller.loginProcessing == false,
+                            replacement: const Center(
+                                child: CircularProgressIndicator()),
+                            child: ElevatedButton(
+                              onPressed: login,
+                              child:
+                                  const Icon(Icons.arrow_circle_right_outlined),
+                            ));
+                      },
+                    )),
                 const SizedBox(height: 30),
                 Center(
                   child: TextButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const ForgotPassword()));
+                        Get.to(const ForgotPassword());
                       },
                       child: const Text("Forget Password?")),
                 ),
@@ -87,10 +84,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   const Text("Don't have an account?"),
                   TextButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const SignupScreen()));
+                        Get.to(const SignupScreen());
                       },
                       child: const Text("Sign up",
                           style: TextStyle(fontWeight: FontWeight.bold)))
@@ -104,36 +98,17 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> login() async {
-    loginProcessing = true;
-    if (mounted) {
-      setState(() {});
-    }
-    NetworkResponse response = await NetworkCaller().postRequest(Urls.login,
-        body: {
-          "email": emailController.text.trim(),
-          "password": passwordController.text
-        },
-        isLogin: true);
-    loginProcessing = false;
-    if (mounted) {
-      setState(() {});
-    }
-    if (response.isSuccess) {
-      await AuthController.saveUserInformation(response.jsonResponse['token'],
-          UserModel.fromJson(response.jsonResponse['data']));
-      if (mounted) {
-        showSnackMessage(context, 'Logged in successfully');
-        Navigator.push(context,
-            MaterialPageRoute(builder: (context) => const BottomNavScreen()));
-      }
-    } else {
-      if (response.statusCode == 401) {
+    if (formKey.currentState!.validate()) {
+      final response = await loginController.login(
+          emailTEController.text.trim(), passwordTEController.text.trim());
+      if (response) {
         if (mounted) {
-          showSnackMessage(context, 'Please check email or password', true);
+          showSnackMessage(context, 'Logged in successfully');
+          Get.offAll(const BottomNavScreen());
         }
       } else {
         if (mounted) {
-          showSnackMessage(context, 'Login failed, please try again', true);
+          showSnackMessage(context, loginController.errorMessage, true);
         }
       }
     }
@@ -141,8 +116,8 @@ class _LoginScreenState extends State<LoginScreen> {
 
   @override
   void dispose() {
-    emailController.dispose();
-    passwordController.dispose();
+    emailTEController.dispose();
+    passwordTEController.dispose();
     super.dispose();
   }
 }

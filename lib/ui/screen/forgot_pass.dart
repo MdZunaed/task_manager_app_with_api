@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/network_caller/network_caller.dart';
-import 'package:task_manager/data/network_caller/network_response.dart';
-import 'package:task_manager/data/utility/urls.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/controller/reset_pass_controller.dart';
 import 'package:task_manager/ui/screen/otp_screen.dart';
 import 'package:task_manager/ui/widget/body_bg.dart';
 import 'package:task_manager/ui/widget/snack_message.dart';
@@ -18,31 +17,7 @@ class ForgotPassword extends StatefulWidget {
 class _ForgotPasswordState extends State<ForgotPassword> {
   final TextEditingController emailTEController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey();
-  bool verifyEmailProcessing = false;
-
-  Future<void> verifyEmail() async {
-    verifyEmailProcessing = true;
-    if (mounted) {
-      setState(() {});
-    }
-    final NetworkResponse response = await NetworkCaller()
-        .getRequest(Urls.verifyEmail(emailTEController.text.trim()));
-    if (response.isSuccess) {
-      verifyEmailProcessing = false;
-      if (mounted) {
-        setState(() {});
-        Navigator.push(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    OtpScreen(email: emailTEController.text.trim())));
-      }
-    } else {
-      if (mounted) {
-        showSnackMessage(context, "Something went error, try again", true);
-      }
-    }
-  }
+  ResetPasswordController controller = Get.find<ResetPasswordController>();
 
   @override
   Widget build(BuildContext context) {
@@ -77,27 +52,28 @@ class _ForgotPasswordState extends State<ForgotPassword> {
                 const SizedBox(height: 16),
                 SizedBox(
                     width: double.infinity,
-                    child: Visibility(
-                      visible: verifyEmailProcessing == false,
-                      replacement:
-                          const Center(child: CircularProgressIndicator()),
-                      child: ElevatedButton(
-                          onPressed: () {
-                            if (formKey.currentState!.validate()) {
-                              verifyEmail();
-                            }
-                          },
-                          child: const Icon(Icons.arrow_circle_right_outlined)),
-                    )),
+                    child: GetBuilder<ResetPasswordController>(
+                        builder: (controller) {
+                      return Visibility(
+                        visible: controller.verifyEmailProcessing == false,
+                        replacement:
+                            const Center(child: CircularProgressIndicator()),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                verifyEmail();
+                              }
+                            },
+                            child:
+                                const Icon(Icons.arrow_circle_right_outlined)),
+                      );
+                    })),
                 const SizedBox(height: 30),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   const Text("Have an account?"),
                   TextButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginScreen()));
+                        Get.to(const LoginScreen());
                       },
                       child: const Text("Sign in",
                           style: TextStyle(fontWeight: FontWeight.bold)))
@@ -108,5 +84,17 @@ class _ForgotPasswordState extends State<ForgotPassword> {
         ),
       ),
     );
+  }
+
+  Future<void> verifyEmail() async {
+    final response =
+        await controller.verifyEmail(emailTEController.text.trim());
+    if (response) {
+      Get.to(OtpScreen(email: emailTEController.text.trim()));
+    } else {
+      if (mounted) {
+        showSnackMessage(context, controller.errorMessage, true);
+      }
+    }
   }
 }

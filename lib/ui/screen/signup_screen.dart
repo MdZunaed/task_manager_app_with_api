@@ -1,10 +1,8 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/network_caller/network_caller.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/controller/signup_controller.dart';
 import 'package:task_manager/ui/widget/body_bg.dart';
 import 'package:task_manager/ui/widget/snack_message.dart';
-
-import '../../data/network_caller/network_response.dart';
-import '../../data/utility/urls.dart';
 import 'login_screen.dart';
 
 class SignupScreen extends StatefulWidget {
@@ -18,10 +16,10 @@ class _SignupScreenState extends State<SignupScreen> {
   final TextEditingController emailTEController = TextEditingController();
   final TextEditingController firstNameTEController = TextEditingController();
   final TextEditingController lastNameTEController = TextEditingController();
-  final TextEditingController mobileNoTEController = TextEditingController();
+  final TextEditingController mobileTEController = TextEditingController();
   final TextEditingController passwordTEController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey();
-  bool signupProcessing = false;
+  SignupController signupController = Get.find<SignupController>();
 
   @override
   Widget build(BuildContext context) {
@@ -56,7 +54,7 @@ class _SignupScreenState extends State<SignupScreen> {
                     decoration: const InputDecoration(hintText: "Last Name")),
                 const SizedBox(height: 16),
                 TextFormField(
-                    controller: mobileNoTEController,
+                    controller: mobileTEController,
                     validator: (String? value) {
                       if (value?.isEmpty ?? true) {
                         return 'Enter phone number';
@@ -85,21 +83,27 @@ class _SignupScreenState extends State<SignupScreen> {
                 const SizedBox(height: 16),
                 SizedBox(
                     width: double.infinity,
-                    child: signupProcessing
-                        ? const Center(child: CircularProgressIndicator())
-                        : ElevatedButton(
-                            onPressed: _signUp,
+                    child: GetBuilder<SignupController>(builder: (controller) {
+                      return Visibility(
+                        visible: controller.signupProcessing == false,
+                        replacement:
+                            const Center(child: CircularProgressIndicator()),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              if (_formKey.currentState!.validate()) {
+                                signup();
+                              }
+                            },
                             child:
-                                const Icon(Icons.arrow_circle_right_outlined))),
+                                const Icon(Icons.arrow_circle_right_outlined)),
+                      );
+                    })),
                 const SizedBox(height: 30),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   const Text("Have an account?"),
                   TextButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginScreen()));
+                        Get.to(const LoginScreen());
                       },
                       child: const Text("Sign in",
                           style: TextStyle(fontWeight: FontWeight.bold)))
@@ -112,38 +116,21 @@ class _SignupScreenState extends State<SignupScreen> {
     );
   }
 
-  Future<void> _signUp() async {
-    if (_formKey.currentState!.validate()) {
-      signupProcessing = true;
+  Future<void> signup() async {
+    final response = await signupController.signUp(
+        emailTEController.text.trim(),
+        firstNameTEController.text.trim(),
+        lastNameTEController.text.trim(),
+        mobileTEController.text.trim(),
+        passwordTEController.text.trim());
+    if (response) {
+      _clearTextFields();
       if (mounted) {
-        setState(() {});
-      }
-      final NetworkResponse response =
-          await NetworkCaller().postRequest(Urls.registration, body: {
-        "email": emailTEController.text.trim(),
-        "firstName": firstNameTEController.text.trim(),
-        "lastName": lastNameTEController.text.trim(),
-        "mobile": mobileNoTEController.text.trim(),
-        "password": passwordTEController.text,
-        "photo": ""
-      });
-      signupProcessing = false;
-      if (mounted) {
-        setState(() {});
-      }
-
-      if (response.isSuccess) {
-        _clearTextFields();
-        if (mounted) {
-          showSnackMessage(context, "Account has been created! please Sign in");
-        }
+        showSnackMessage(context, signupController.message);
       }
     } else {
-      signupProcessing = false;
-      setState(() {});
       if (mounted) {
-        showSnackMessage(
-            context, "Account creation failed! please try again", true);
+        showSnackMessage(context, signupController.message, true);
       }
     }
   }
@@ -152,7 +139,7 @@ class _SignupScreenState extends State<SignupScreen> {
     emailTEController.clear();
     firstNameTEController.clear();
     lastNameTEController.clear();
-    mobileNoTEController.clear();
+    mobileTEController.clear();
     passwordTEController.clear();
   }
 
@@ -161,7 +148,7 @@ class _SignupScreenState extends State<SignupScreen> {
     emailTEController.dispose();
     firstNameTEController.dispose();
     lastNameTEController.dispose();
-    mobileNoTEController.dispose();
+    mobileTEController.dispose();
     passwordTEController.dispose();
     super.dispose();
   }

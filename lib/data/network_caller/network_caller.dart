@@ -1,12 +1,10 @@
 import 'dart:convert';
 import 'dart:developer';
-
 import 'package:flutter/material.dart';
 import 'package:http/http.dart';
 import 'package:task_manager/controller/auth_controller.dart';
 import 'package:task_manager/main.dart';
 import 'package:task_manager/ui/screen/login_screen.dart';
-
 import 'network_response.dart';
 
 class NetworkCaller {

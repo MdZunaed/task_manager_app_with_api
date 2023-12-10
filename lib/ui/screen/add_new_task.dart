@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:task_manager/data/network_caller/network_caller.dart';
-import 'package:task_manager/data/network_caller/network_response.dart';
-import 'package:task_manager/data/utility/urls.dart';
-import 'package:task_manager/ui/screen/main_nav_screen.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/controller/add_task_controller.dart';
 import 'package:task_manager/ui/widget/body_bg.dart';
 import 'package:task_manager/ui/widget/profile_card.dart';
 import 'package:task_manager/ui/widget/snack_message.dart';
@@ -15,101 +13,87 @@ class AddNewTaskScreen extends StatefulWidget {
 }
 
 class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
-  final TextEditingController subTEController = TextEditingController();
-  final TextEditingController desTEController = TextEditingController();
+  final TextEditingController titleTEController = TextEditingController();
+  final TextEditingController descriptionTEController = TextEditingController();
   final GlobalKey<FormState> formKey = GlobalKey();
-  bool addTaskProcessing = false;
-
-  Future<void> createTask() async {
-    if (formKey.currentState!.validate()) {
-      addTaskProcessing = true;
-      if (mounted) {
-        setState(() {});
-      }
-      final NetworkResponse response =
-          await NetworkCaller().postRequest(Urls.createNewTask, body: {
-        "title": subTEController.text.trim(),
-        "description": desTEController.text.trim(),
-        "status": "New"
-      });
-      addTaskProcessing = false;
-      if (mounted) {
-        setState(() {});
-      }
-      if (response.isSuccess) {
-        if (mounted) {
-          showSnackMessage(context, "New task created");
-        }
-        subTEController.clear();
-        desTEController.clear();
-      } else {
-        if (mounted) {
-          showSnackMessage(context, "Task creation failed", true);
-        }
-      }
-    }
-  }
+  AddTaskController controller = Get.find<AddTaskController>();
 
   @override
   Widget build(BuildContext context) {
-    return WillPopScope(
-      onWillPop: () async {
-        await Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const BottomNavScreen()),
-            (route) => false);
-        return false;
-      },
-      child: Scaffold(
-        body: SafeArea(
-          child: Column(
-            children: [
-              const ProfileCard(),
-              Expanded(
-                  child: BodyBackground(
-                child: SingleChildScrollView(
-                  padding: const EdgeInsets.all(16),
-                  child: Form(
-                    key: formKey,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const SizedBox(height: 30),
-                        Text("Add New Task",
-                            style: Theme.of(context).textTheme.titleLarge),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                            controller: subTEController,
-                            validator: validator,
-                            decoration:
-                                const InputDecoration(hintText: "Subject")),
-                        const SizedBox(height: 16),
-                        TextFormField(
-                            maxLines: 5,
-                            controller: desTEController,
-                            validator: validator,
-                            decoration:
-                                const InputDecoration(hintText: "Description")),
-                        const SizedBox(height: 16),
-                        SizedBox(
-                          width: double.infinity,
-                          child: addTaskProcessing
-                              ? const Center(child: CircularProgressIndicator())
-                              : ElevatedButton(
-                                  onPressed: createTask,
-                                  child: const Icon(Icons.add_circle),
-                                ),
-                        ),
-                      ],
-                    ),
+    return Scaffold(
+      body: SafeArea(
+        child: Column(
+          children: [
+            const ProfileCard(),
+            Expanded(
+                child: BodyBackground(
+              child: SingleChildScrollView(
+                padding: const EdgeInsets.all(16),
+                child: Form(
+                  key: formKey,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      const SizedBox(height: 30),
+                      Text("Add New Task",
+                          style: Theme.of(context).textTheme.titleLarge),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                          controller: titleTEController,
+                          validator: validator,
+                          decoration: const InputDecoration(hintText: "Title")),
+                      const SizedBox(height: 16),
+                      TextFormField(
+                          maxLines: 5,
+                          controller: descriptionTEController,
+                          validator: validator,
+                          decoration:
+                              const InputDecoration(hintText: "Description")),
+                      const SizedBox(height: 16),
+                      SizedBox(
+                        width: double.infinity,
+                        child: GetBuilder<AddTaskController>(
+                            builder: (controller) {
+                          return Visibility(
+                            visible: controller.addTaskProcessing == false,
+                            replacement: const Center(
+                                child: CircularProgressIndicator()),
+                            child: ElevatedButton(
+                              onPressed: () {
+                                if (formKey.currentState!.validate()) {
+                                  addNewTask();
+                                }
+                              },
+                              child: const Icon(Icons.add_circle),
+                            ),
+                          );
+                        }),
+                      ),
+                    ],
                   ),
                 ),
-              ))
-            ],
-          ),
+              ),
+            ))
+          ],
         ),
       ),
     );
+  }
+
+  Future<void> addNewTask() async {
+    final response = await controller.addNewTask(
+        titleTEController.text.trim(), descriptionTEController.text.trim());
+    if (response) {
+      titleTEController.clear();
+      descriptionTEController.clear();
+      if (mounted) {
+        showSnackMessage(context, controller.message);
+      }
+    } else {
+      if (mounted) {
+        showSnackMessage(context, controller.message, true);
+      }
+    }
   }
 
   String? validator(String? value) {
@@ -121,8 +105,16 @@ class _AddNewTaskScreenState extends State<AddNewTaskScreen> {
 
   @override
   void dispose() {
-    subTEController.dispose();
-    desTEController.dispose();
+    titleTEController.dispose();
+    descriptionTEController.dispose();
     super.dispose();
   }
 }
+
+// onWillPop: () async {
+// await Navigator.pushAndRemoveUntil(
+// context,
+// MaterialPageRoute(builder: (context) => const BottomNavScreen()),
+// (route) => false);
+// return false;
+// },

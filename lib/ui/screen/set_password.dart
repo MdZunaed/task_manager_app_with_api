@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:http/http.dart';
-import 'package:task_manager/data/network_caller/network_caller.dart';
-import 'package:task_manager/data/network_caller/network_response.dart';
-import 'package:task_manager/data/utility/urls.dart';
+import 'package:get/get.dart';
+import 'package:task_manager/controller/reset_pass_controller.dart';
 import 'package:task_manager/ui/widget/body_bg.dart';
 import 'package:task_manager/ui/widget/snack_message.dart';
 import 'login_screen.dart';
@@ -21,44 +19,7 @@ class _SetPasswordState extends State<SetPassword> {
   final TextEditingController passwordTEController = TextEditingController();
   final TextEditingController cPasswordTEController = TextEditingController();
   GlobalKey<FormState> formKey = GlobalKey();
-  bool resetPasswordProcessing = false;
-
-  Future<void> resetPassword() async {
-    resetPasswordProcessing = true;
-    if (mounted) {
-      setState(() {});
-    }
-    final NetworkResponse response = await NetworkCaller()
-        .postRequest(Urls.resetPass, body: {
-      "email": widget.email,
-      "OTP": widget.otp,
-      "password": passwordTEController.text
-    });
-    resetPasswordProcessing = false;
-    if (mounted) {
-      setState(() {});
-    }
-    if (response.jsonResponse['status'] == 'fail') {
-      resetPasswordProcessing = false;
-      if (mounted) {
-        setState(() {});
-        showSnackMessage(context, "wrong email or otp check again", true);
-      }
-    } else if (response.isSuccess) {
-      if (mounted) {
-        showSnackMessage(context, "Password reset success");
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => const LoginScreen()),
-            (route) => false);
-      }
-    } else {
-      if (mounted) {
-        showSnackMessage(
-            context, "Password reset failed, check email or otp", true);
-      }
-    }
-  }
+  ResetPasswordController controller = Get.find<ResetPasswordController>();
 
   @override
   Widget build(BuildContext context) {
@@ -95,31 +56,36 @@ class _SetPasswordState extends State<SetPassword> {
                 const SizedBox(height: 16),
                 SizedBox(
                     width: double.infinity,
-                    child: Visibility(
-                      visible: resetPasswordProcessing == false,
-                      replacement:
-                          const Center(child: CircularProgressIndicator()),
-                      child: ElevatedButton(
-                          onPressed: () {
-                            if (passwordTEController.text.trim() !=
-                                cPasswordTEController.text.trim()) {
-                              showSnackMessage(
-                                  context, 'password do not match');
-                            } else if (formKey.currentState!.validate()) {
-                              resetPassword();
-                            }
-                          },
-                          child: const Text("Confirm")),
-                    )),
+                    child:
+                        GetBuilder<ResetPasswordController>(builder: (context) {
+                      return Visibility(
+                        visible: controller.resetPasswordProcessing == false,
+                        replacement:
+                            const Center(child: CircularProgressIndicator()),
+                        child: ElevatedButton(
+                            onPressed: () {
+                              if (formKey.currentState!.validate()) {
+                                resetPassword();
+                              }
+                            },
+                            // onPressed: () {
+                            //   if (passwordTEController.text !=
+                            //       cPasswordTEController.text) {
+                            //     showSnackMessage(
+                            //         context, 'password do not match');
+                            //   } else if (formKey.currentState!.validate()) {
+                            //     resetPassword();
+                            //   }
+                            // },
+                            child: const Text("Confirm")),
+                      );
+                    })),
                 const SizedBox(height: 30),
                 Row(mainAxisAlignment: MainAxisAlignment.center, children: [
                   const Text("Have an account?"),
                   TextButton(
                       onPressed: () {
-                        Navigator.push(
-                            context,
-                            MaterialPageRoute(
-                                builder: (context) => const LoginScreen()));
+                        Get.to(const LoginScreen());
                       },
                       child: const Text("Sign in",
                           style: TextStyle(fontWeight: FontWeight.bold)))
@@ -132,10 +98,29 @@ class _SetPasswordState extends State<SetPassword> {
     );
   }
 
+  Future<void> resetPassword() async {
+    final response = await controller.resetPassword(
+        widget.email, widget.otp, passwordTEController.text);
+    if (response) {
+      if (mounted) {
+        showSnackMessage(context, "Password reset success");
+      }
+      Get.offAll(const LoginScreen());
+    } else {
+      if (mounted) {
+        showSnackMessage(context, controller.errorMessage, true);
+      }
+    }
+  }
+
   String? validator(String? value) {
     if (value?.isEmpty ?? true) {
       return 'enter valid value';
-    } else if (value!.trim().length < 6) {}
+    } else if (value!.trim().length < 6) {
+      return "password should be minimum 6 digit";
+    } else if (passwordTEController.text != cPasswordTEController.text) {
+      return "password do not match";
+    }
     return null;
   }
 }

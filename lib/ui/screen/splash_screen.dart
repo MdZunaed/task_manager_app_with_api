@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_svg/flutter_svg.dart';
+import 'package:get/get.dart';
 import 'package:task_manager/controller/auth_controller.dart';
 import 'package:task_manager/ui/screen/login_screen.dart';
-import 'package:task_manager/ui/screen/main_nav_screen.dart';
+import 'package:task_manager/ui/screen/bottom_nav_screen.dart';
 import 'package:task_manager/ui/widget/body_bg.dart';
 
 class SplashScreen extends StatefulWidget {
@@ -20,14 +21,9 @@ class _SplashScreenState extends State<SplashScreen> {
   }
 
   void goToLogin() async {
-    final bool isLoggedIn = await AuthController.checkAuthState();
+    final bool isLoggedIn = await Get.find<AuthController>().checkAuthState();
     Future.delayed(const Duration(seconds: 1)).then((value) =>
-        Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(
-                builder: (context) =>
-                    isLoggedIn ? const BottomNavScreen() : const LoginScreen()),
-            (route) => false));
+        Get.offAll(isLoggedIn ? const BottomNavScreen() : const LoginScreen()));
   }
 
   @override
