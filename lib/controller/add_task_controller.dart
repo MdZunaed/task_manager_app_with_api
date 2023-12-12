@@ -4,6 +4,8 @@ import 'package:task_manager/data/network_caller/network_caller.dart';
 import 'package:task_manager/data/network_caller/network_response.dart';
 import 'package:task_manager/data/utility/urls.dart';
 
+import 'task_summary_controller.dart';
+
 class AddTaskController extends GetxController {
   bool _addTaskProcessing = false;
   String _message = "";
@@ -22,6 +24,7 @@ class AddTaskController extends GetxController {
     update();
     if (response.isSuccess) {
       Get.find<NewTaskController>().getNewTaskList();
+      Get.find<TaskSummaryController>().getTaskCountSummaryList();
       _message = "New task created";
       update();
       return true;

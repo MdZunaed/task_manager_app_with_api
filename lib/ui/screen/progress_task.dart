@@ -18,6 +18,14 @@ class _ProgressTaskScreenState extends State<ProgressTaskScreen> {
     Get.find<ProgressTaskController>().getProgressTaskList();
   }
 
+  // @override
+  // void initState() {
+  //   WidgetsBinding.instance.addPostFrameCallback((timeStamp) {
+  //   });
+  //   super.initState();
+  //
+  // }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -41,7 +49,6 @@ class _ProgressTaskScreenState extends State<ProgressTaskScreen> {
                         onStatusChange: () {
                           controller.getProgressTaskList();
                         },
-                        showProgress: (inProgress) {},
                       );
                     }),
               ),

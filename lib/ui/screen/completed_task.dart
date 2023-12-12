@@ -41,7 +41,6 @@ class _CompletedTaskScreenState extends State<CompletedTaskScreen> {
                         onStatusChange: () {
                           controller.getCompletedTaskList();
                         },
-                        showProgress: (inProgress) {},
                       );
                     }),
               ),

@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:task_manager/data/network_caller/network_caller.dart';
-import 'package:task_manager/data/utility/urls.dart';
+import 'package:task_manager/controller/task_controller.dart';
 import 'package:task_manager/models/task.dart';
 import 'package:task_manager/ui/widget/snack_message.dart';
 
@@ -15,14 +14,12 @@ enum TaskStatus {
 class TaskItemCard extends StatefulWidget {
   final Task task;
   final VoidCallback onStatusChange;
-  final Function(bool) showProgress;
   final Color statusBgColor;
 
   const TaskItemCard(
       {super.key,
       required this.task,
       required this.onStatusChange,
-      required this.showProgress,
       this.statusBgColor = Colors.lightBlue});
 
   @override
@@ -30,28 +27,7 @@ class TaskItemCard extends StatefulWidget {
 }
 
 class _TaskItemCardState extends State<TaskItemCard> {
-  Future<void> updateTaskStatus(String status) async {
-    widget.showProgress(true);
-    final response = await NetworkCaller()
-        .getRequest(Urls.updateTaskStatus(widget.task.sId ?? '', status));
-    if (response.isSuccess) {
-      widget.onStatusChange();
-    }
-    widget.showProgress(false);
-  }
-
-  Future<void> deleteTask() async {
-    widget.showProgress(true);
-    final response = await NetworkCaller()
-        .getRequest(Urls.deleteTask(widget.task.sId ?? ''));
-    if (response.isSuccess) {
-      if (mounted) {
-        showSnackMessage(context, "Task deleted");
-      }
-      widget.onStatusChange();
-      widget.showProgress(false);
-    }
-  }
+  TaskController controller = Get.find<TaskController>();
 
   @override
   Widget build(BuildContext context) {
@@ -81,7 +57,9 @@ class _TaskItemCardState extends State<TaskItemCard> {
                 Wrap(
                   children: [
                     IconButton(
-                        onPressed: deleteTask,
+                        onPressed: () {
+                          deleteTask();
+                        },
                         icon: const Icon(
                           Icons.delete,
                           color: Colors.red,
@@ -105,7 +83,7 @@ class _TaskItemCardState extends State<TaskItemCard> {
               title: Text(e.name),
               onTap: () {
                 updateTaskStatus(e.name);
-                Navigator.pop(context);
+                Get.back();
               },
             ))
         .toList();
@@ -127,5 +105,28 @@ class _TaskItemCardState extends State<TaskItemCard> {
             ),
           );
         });
+  }
+
+  Future<void> updateTaskStatus(String status) async {
+    final response =
+        await controller.updateTaskStatus(widget.task.sId ?? '', status);
+    if (response) {
+      widget.onStatusChange();
+    } else {
+      if (mounted) {
+        showSnackMessage(context, "Error! something went wrong", true);
+      }
+    }
+  }
+
+  Future<void> deleteTask() async {
+    final response = await controller.deleteTask(widget.task.sId);
+    if (response) {
+      widget.onStatusChange();
+    } else {
+      if (mounted) {
+        showSnackMessage(context, "Error! something went wrong", true);
+      }
+    }
   }
 }

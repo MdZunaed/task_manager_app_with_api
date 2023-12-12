@@ -41,7 +41,6 @@ class _CancelledTaskScreenState extends State<CancelledTaskScreen> {
                         onStatusChange: () {
                           controller.getCancelledTaskList();
                         },
-                        showProgress: (inProgress) {},
                       );
                     }),
               ),

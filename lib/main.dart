@@ -10,6 +10,7 @@ import 'package:task_manager/controller/new_task_controller.dart';
 import 'package:task_manager/controller/progress_task_controller.dart';
 import 'package:task_manager/controller/reset_pass_controller.dart';
 import 'package:task_manager/controller/signup_controller.dart';
+import 'package:task_manager/controller/task_controller.dart';
 import 'package:task_manager/controller/task_summary_controller.dart';
 import 'package:task_manager/controller/update_profile_controller.dart';
 import 'package:task_manager/ui/screen/splash_screen.dart';
@@ -55,6 +56,7 @@ class ControllerBindings extends Bindings {
     Get.put(UpdateProfileController());
     Get.put(BottomNavController());
     Get.put(TaskSummaryController());
+    Get.put(TaskController());
     Get.put(AddTaskController());
     Get.put(NewTaskController());
     Get.put(ProgressTaskController());
