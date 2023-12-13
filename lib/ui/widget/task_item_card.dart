@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:task_manager/controller/task_controller.dart';
 import 'package:task_manager/models/task.dart';
+import 'package:task_manager/ui/widget/show_loader.dart';
 import 'package:task_manager/ui/widget/snack_message.dart';
 
 enum TaskStatus {
@@ -16,11 +17,10 @@ class TaskItemCard extends StatefulWidget {
   final VoidCallback onStatusChange;
   final Color statusBgColor;
 
-  const TaskItemCard(
-      {super.key,
-      required this.task,
-      required this.onStatusChange,
-      this.statusBgColor = Colors.lightBlue});
+  const TaskItemCard({super.key,
+    required this.task,
+    required this.onStatusChange,
+    this.statusBgColor = Colors.lightBlue});
 
   @override
   State<TaskItemCard> createState() => _TaskItemCardState();
@@ -40,7 +40,7 @@ class _TaskItemCardState extends State<TaskItemCard> {
           children: [
             Text(widget.task.title ?? '',
                 style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
+                const TextStyle(fontSize: 16, fontWeight: FontWeight.w500)),
             const SizedBox(height: 6),
             Text(widget.task.description ?? '',
                 style: const TextStyle(color: Colors.black54)),
@@ -79,13 +79,14 @@ class _TaskItemCardState extends State<TaskItemCard> {
 
   void showUpdateStatusModal() {
     List<ListTile> items = TaskStatus.values
-        .map((e) => ListTile(
-              title: Text(e.name),
-              onTap: () {
-                updateTaskStatus(e.name);
-                Get.back();
-              },
-            ))
+        .map((e) =>
+        ListTile(
+          title: Text(e.name),
+          onTap: () {
+            Get.back();
+            updateTaskStatus(e.name);
+          },
+        ))
         .toList();
     showDialog(
         context: context,
@@ -108,8 +109,10 @@ class _TaskItemCardState extends State<TaskItemCard> {
   }
 
   Future<void> updateTaskStatus(String status) async {
+    UiHelper.showLoader(context);
     final response =
-        await controller.updateTaskStatus(widget.task.sId ?? '', status);
+    await controller.updateTaskStatus(widget.task.sId ?? '', status);
+    Get.back();
     if (response) {
       widget.onStatusChange();
     } else {
@@ -120,7 +123,9 @@ class _TaskItemCardState extends State<TaskItemCard> {
   }
 
   Future<void> deleteTask() async {
+    UiHelper.showLoader(context);
     final response = await controller.deleteTask(widget.task.sId);
+    Get.back();
     if (response) {
       widget.onStatusChange();
     } else {

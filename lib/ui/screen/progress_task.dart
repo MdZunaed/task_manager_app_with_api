@@ -12,10 +12,15 @@ class ProgressTaskScreen extends StatefulWidget {
 }
 
 class _ProgressTaskScreenState extends State<ProgressTaskScreen> {
+  final controller = Get.find<ProgressTaskController>();
+
   @override
   void initState() {
     super.initState();
     Get.find<ProgressTaskController>().getProgressTaskList();
+    // if (controller.taskListModel.taskList?.isEmpty ?? true) {
+    //   controller.getProgressTaskList();
+    // }
   }
 
   // @override
