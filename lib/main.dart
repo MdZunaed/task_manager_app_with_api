@@ -30,15 +30,22 @@ class TaskManagerApp extends StatelessWidget {
       debugShowCheckedModeBanner: false,
       navigatorKey: navigationKey,
       theme: ThemeData(
-        primaryColor: Colors.green,
-        primarySwatch: Colors.green,
+        useMaterial3: true,
+        colorScheme: ColorScheme.fromSwatch(
+            primarySwatch: Colors.green, backgroundColor: Colors.white),
+        chipTheme: const ChipThemeData(side: BorderSide.none),
         inputDecorationTheme: const InputDecorationTheme(
             filled: true,
             fillColor: Colors.white,
             border: OutlineInputBorder(borderSide: BorderSide.none),
             focusedBorder: OutlineInputBorder(borderSide: BorderSide.none)),
         elevatedButtonTheme: ElevatedButtonThemeData(
-            style: ElevatedButton.styleFrom(padding: const EdgeInsets.all(10))),
+            style: ElevatedButton.styleFrom(
+                backgroundColor: Colors.green,
+                foregroundColor: Colors.white,
+                shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(12)),
+                padding: const EdgeInsets.all(10))),
       ),
       home: const SplashScreen(),
       initialBinding: ControllerBindings(),
