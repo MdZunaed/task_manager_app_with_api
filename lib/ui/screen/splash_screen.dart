@@ -22,15 +22,16 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void goToLogin() async {
     final bool isLoggedIn = await Get.find<AuthController>().checkAuthState();
-    Future.delayed(const Duration(seconds: 1)).then((value) =>
-        Get.offAll(isLoggedIn ? const BottomNavScreen() : const LoginScreen()));
+    Future.delayed(const Duration(seconds: 1))
+        .then((value) => Get.offAll(isLoggedIn ? const BottomNavScreen() : const LoginScreen()));
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-        body: BodyBackground(
-      child: Center(child: SvgPicture.asset("assets/images/logo.svg")),
-    ));
+      body: BodyBackground(
+        child: Center(child: SvgPicture.asset("assets/images/logo.svg")),
+      ),
+    );
   }
 }

@@ -1,4 +1,5 @@
 import 'package:get/get.dart';
+
 import '../data/network_caller/network_caller.dart';
 import '../data/network_caller/network_response.dart';
 import '../data/utility/urls.dart';
@@ -26,8 +27,7 @@ class LoginController extends GetxController {
     update();
     if (response.isSuccess) {
       await Get.find<AuthController>().saveUserInformation(
-          response.jsonResponse['token'],
-          UserModel.fromJson(response.jsonResponse['data']));
+          response.jsonResponse['token'], UserModel.fromJson(response.jsonResponse['data'][0]));
       return true;
     } else {
       if (response.statusCode == 401) {
